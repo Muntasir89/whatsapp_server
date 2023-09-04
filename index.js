@@ -10,7 +10,10 @@ var io = require("socket.io")(server);
 // midleware
 app.use(express.json());
 var clients = {};
-// app.use(cors()); npm 
+
+const routes = require("./routes");
+app.use("/routes", routes);
+
 io.on("connection", (socket) => { 
 
     console.log("Connected");
@@ -23,10 +26,15 @@ io.on("connection", (socket) => {
     socket.on("message", (msg)=>{ 
         console.log(msg);
         let targetId = msg.targetId;
-        clients[targetId].emit("message", msg);
+        if(clients[targetId])
+            clients[targetId].emit("message", msg);
     });
 });
 
 server.listen(port, "0.0.0.0", () => { 
     console.log("server started");
 });
+
+app.route('/check').get((req, res)=>{
+    return res.json("Your App is working fine");
+})
